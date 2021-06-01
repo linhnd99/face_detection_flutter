@@ -11,22 +11,22 @@ class BoundingBox extends StatelessWidget {
   final double screenW;
 
   BoundingBox(
-      this.results,
-      this.previewH,
-      this.previewW,
-      this.screenH,
-      this.screenW,
-      );
+    this.results,
+    this.previewH,
+    this.previewW,
+    this.screenH,
+    this.screenW,
+  );
 
   @override
   Widget build(BuildContext context) {
     List<Widget> _renderBox() {
-      if (results.length==0) return [Container()];
+      if (results.length == 0) return [Container()];
       return results.map((re) {
         Detection dt = re as Detection;
-        var _x = dt.xMin*dt.width;
+        var _x = dt.xMin * dt.width;
         var _w = dt.width;
-        var _y = dt.yMin*dt.height;
+        var _y = dt.yMin * dt.height;
         var _h = dt.height;
         // var _x = re["rect"]["x"];
         // var _w = re["rect"]["w"];
@@ -68,7 +68,7 @@ class BoundingBox extends StatelessWidget {
               ),
             ),
             child: Text(
-              "${dt.classID} ${(dt.score*100).toStringAsFixed(0)}%",
+              "${dt.classID} ${(dt.score * 100).toStringAsFixed(0)}%",
               style: TextStyle(
                 color: Color.fromRGBO(37, 213, 253, 1.0),
                 fontSize: 14.0,

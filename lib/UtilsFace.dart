@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:scidart/numdart.dart';
 
 import 'Model/AnchorOption.dart';
@@ -8,27 +6,27 @@ import 'Model/OptionsFace.dart';
 
 class UtilsFace {
   List<Anchor> getAnchors(AnchorOption options) {
-    List<Anchor> _anchors = new List();
+    List<Anchor> _anchors = [];
     if (options.stridesSize != options.numLayers) {
       print('strides_size and num_layers must be equal.');
       return [];
     }
     int layerID = 0;
     while (layerID < options.stridesSize) {
-      List<double> anchorHeight = new List();
-      List<double> anchorWidth = new List();
-      List<double> aspectRatios = new List();
-      List<double> scales = new List();
+      List<double> anchorHeight = [];
+      List<double> anchorWidth = [];
+      List<double?> aspectRatios = [];
+      List<double> scales = [];
 
       int lastSameStrideLayer = layerID;
       while (lastSameStrideLayer < options.stridesSize &&
-          options.strides[lastSameStrideLayer] == options.strides[layerID]) {
-        double scale = options.minScale +
-            (options.maxScale - options.minScale) *
+          options.strides![lastSameStrideLayer] == options.strides![layerID]) {
+        double scale = options.minScale! +
+            (options.maxScale! - options.minScale!) *
                 1.0 *
                 lastSameStrideLayer /
                 (options.stridesSize - 1.0);
-        if (lastSameStrideLayer == 0 && options.reduceBoxesInLowestLayer) {
+        if (lastSameStrideLayer == 0 && options.reduceBoxesInLowestLayer!) {
           aspectRatios.add(1.0);
           aspectRatios.add(2.0);
           aspectRatios.add(0.5);
@@ -36,18 +34,18 @@ class UtilsFace {
           scales.add(scale);
           scales.add(scale);
         } else {
-          for (int i = 0; i < options.aspectRatios.length; i++) {
-            aspectRatios.add(options.aspectRatios[i]);
+          for (int i = 0; i < options.aspectRatios!.length; i++) {
+            aspectRatios.add(options.aspectRatios![i]);
             scales.add(scale);
           }
 
-          if (options.interpolatedScaleAspectRatio > 0.0) {
+          if (options.interpolatedScaleAspectRatio! > 0.0) {
             double scaleNext = 0.0;
             if (lastSameStrideLayer == options.stridesSize - 1) {
               scaleNext = 1.0;
             } else {
-              scaleNext = options.minScale +
-                  (options.maxScale - options.minScale) *
+              scaleNext = options.minScale! +
+                  (options.maxScale! - options.minScale!) *
                       1.0 *
                       (lastSameStrideLayer + 1) /
                       (options.stridesSize - 1.0);
@@ -59,31 +57,31 @@ class UtilsFace {
         lastSameStrideLayer++;
       }
       for (int i = 0; i < aspectRatios.length; i++) {
-        double ratioSQRT = sqrt(aspectRatios[i]);
+        double ratioSQRT = sqrt(aspectRatios[i]!);
         anchorHeight.add(scales[i] / ratioSQRT);
         anchorWidth.add(scales[i] * ratioSQRT);
       }
       int featureMapHeight = 0;
       int featureMapWidth = 0;
       if (options.featureMapHeightSize > 0) {
-        featureMapHeight = options.featureMapHeight[layerID];
-        featureMapWidth = options.featureMapWidth[layerID];
+        featureMapHeight = options.featureMapHeight![layerID];
+        featureMapWidth = options.featureMapWidth![layerID];
       } else {
-        int stride = options.strides[layerID];
-        featureMapHeight = (1.0 * options.inputSizeHeight / stride).ceil();
-        featureMapWidth = (1.0 * options.inputSizeWidth / stride).ceil();
+        int stride = options.strides![layerID];
+        featureMapHeight = (1.0 * options.inputSizeHeight! / stride).ceil();
+        featureMapWidth = (1.0 * options.inputSizeWidth! / stride).ceil();
       }
 
       for (int y = 0; y < featureMapHeight; y++) {
         for (int x = 0; x < featureMapWidth; x++) {
           for (int anchorID = 0; anchorID < anchorHeight.length; anchorID++) {
             double xCenter =
-                (x + options.anchorOffsetX) * 1.0 / featureMapWidth;
+                (x + options.anchorOffsetX!) * 1.0 / featureMapWidth;
             double yCenter =
-                (y + options.anchorOffsetY) * 1.0 / featureMapHeight;
+                (y + options.anchorOffsetY!) * 1.0 / featureMapHeight;
             double w = 0;
             double h = 0;
-            if (options.fixedAnchorSize) {
+            if (options.fixedAnchorSize!) {
               w = 1.0;
               h = 1.0;
             } else {
@@ -100,26 +98,26 @@ class UtilsFace {
   }
 
   List<Detection> process(
-      {OptionsFace options,
-        List<double> rawScores,
-        List<double> rawBoxes,
-        List<Anchor> anchors}) {
-    List<double> detectionScores = new List();
-    List<int> detectionClasses = new List();
+      {required OptionsFace options,
+      List<double>? rawScores,
+      List<double>? rawBoxes,
+      List<Anchor>? anchors}) {
+    List<double> detectionScores = [];
+    List<int> detectionClasses = [];
 
-    int boxes = options.numBoxes;
+    int boxes = options.numBoxes!;
     for (int i = 0; i < boxes; i++) {
       int classId = -1;
       double maxScore = double.minPositive;
-      for (int scoreIdx = 0; scoreIdx < options.numClasses; scoreIdx++) {
-        double score = rawScores[i * options.numClasses + scoreIdx];
+      for (int scoreIdx = 0; scoreIdx < options.numClasses!; scoreIdx++) {
+        double? score = rawScores![i * options.numClasses! + scoreIdx];
         if (options.sigmoidScore) {
-          if (options.scoreClippingThresh > 0) {
-            if (score < -options.scoreClippingThresh)
-              score = -options.scoreClippingThresh;
-            if (score > options.scoreClippingThresh)
+          if (options.scoreClippingThresh! > 0) {
+            if (score < -options.scoreClippingThresh!)
+              score = -options.scoreClippingThresh!;
+            if (score > options.scoreClippingThresh!)
               score = options.scoreClippingThresh;
-            score = 1.0 / (1.0 + exp(-score));
+            score = 1.0 / (1.0 + exp(-score!));
             if (maxScore < score) {
               maxScore = score;
               classId = scoreIdx;
@@ -136,16 +134,16 @@ class UtilsFace {
   }
 
   List<Detection> convertToDetections(
-      List<double> rawBoxes,
-      List<Anchor> anchors,
+      List<double>? rawBoxes,
+      List<Anchor>? anchors,
       List<double> detectionScores,
       List<int> detectionClasses,
       OptionsFace options) {
-    List<Detection> _outputDetections = new List();
-    for (int i = 0; i < options.numBoxes; i++) {
-      if (detectionScores[i] < options.minScoreThresh) continue;
+    List<Detection> _outputDetections = [];
+    for (int i = 0; i < options.numBoxes!; i++) {
+      if (detectionScores[i] < options.minScoreThresh!) continue;
       int boxOffset = 0;
-      Array boxData = decodeBox(rawBoxes, i, anchors, options);
+      Array boxData = decodeBox(rawBoxes!, i, anchors!, options);
       Detection detection = convertToDetection(
           boxData[boxOffset + 0],
           boxData[boxOffset + 1],
@@ -161,8 +159,9 @@ class UtilsFace {
 
   Array decodeBox(
       List<double> rawBoxes, int i, List<Anchor> anchors, OptionsFace options) {
-    Array boxData = Array(List<double>.generate(options.numCoords, (i) => 0.0));
-    int boxOffset = i * options.numCoords + options.boxCoordOffset;
+    Array boxData =
+        Array(List<double>.generate(options.numCoords!, (i) => 0.0));
+    int boxOffset = i * options.numCoords! + options.boxCoordOffset;
     double yCenter = rawBoxes[boxOffset];
     double xCenter = rawBoxes[boxOffset + 1];
     double h = rawBoxes[boxOffset + 2];
@@ -197,8 +196,8 @@ class UtilsFace {
 
     if (options.numKeypoints > 0) {
       for (int k = 0; k < options.numKeypoints; k++) {
-        int offset = i * options.numCoords +
-            options.keypointCoordOffset +
+        int offset = i * options.numCoords! +
+            options.keypointCoordOffset! +
             k * options.numValuesPerKeypoint;
         double keyPointY = rawBoxes[offset];
         double keyPointX = rawBoxes[offset + 1];
@@ -230,11 +229,11 @@ class UtilsFace {
 
   List<Detection> origNms(List<Detection> detections, double threshold) {
     if (detections.length <= 0) return [];
-    List<double> x1 = new List();
-    List<double> x2 = new List();
-    List<double> y1 = new List();
-    List<double> y2 = new List();
-    List<double> s = new List();
+    List<double> x1 = [];
+    List<double> x2 = [];
+    List<double> y1 = [];
+    List<double> y2 = [];
+    List<double> s = [];
 
     detections.forEach((detection) {
       x1.add(detection.xMin);
@@ -251,7 +250,7 @@ class UtilsFace {
 
     Array area = (_x2 - _x1) * (_y2 - _y1);
     List<double> I = _quickSort(s);
-    List<int> positions = new List();
+    List<int> positions = [];
     I.forEach((element) {
       positions.add(s.indexOf(element));
     });
@@ -259,7 +258,7 @@ class UtilsFace {
     List<int> ind0 = positions.sublist(positions.length - 1, positions.length);
     List<int> ind1 = positions.sublist(0, positions.length - 1);
 
-    List<int> pick = new List();
+    List<int> pick = [];
     while (I.length > 0) {
       Array xx1 = _maximum(_itemIndex(_x1, ind0)[0], _itemIndex(_x1, ind1));
       Array yy1 = _maximum(_itemIndex(_y1, ind0)[0], _itemIndex(_y1, ind1));
@@ -277,7 +276,7 @@ class UtilsFace {
   }
 
   Array _sum(double a, Array b) {
-    List<double> _temp = new List();
+    List<double> _temp = [];
     b.forEach((element) {
       _temp.add(a + element);
     });
@@ -285,7 +284,7 @@ class UtilsFace {
   }
 
   Array _maximum(double value, Array itemIndex) {
-    List<double> _temp = new List();
+    List<double> _temp = [];
     itemIndex.forEach((element) {
       if (value > element)
         _temp.add(value);
@@ -296,19 +295,18 @@ class UtilsFace {
   }
 
   Array _itemIndex(Array item, List<int> positions) {
-    List<double> _temp = new List();
+    List<double> _temp = [];
     positions.forEach((element) => _temp.add(item[element]));
     return new Array(_temp);
   }
 
   List<double> _quickSort(List<double> a) {
-    if (a.length <= 1)
-      return a;
+    if (a.length <= 1) return a;
 
     var pivot = a[0];
-    var less = new List<double>();
-    var more = new List<double>();
-    var pivotList = new List<double>();
+    List<double> less = [];
+    List<double> more = [];
+    List<double> pivotList = [];
 
     a.forEach((var i) {
       if (i.compareTo(pivot) < 0) {
@@ -327,5 +325,4 @@ class UtilsFace {
     less.addAll(more);
     return less;
   }
-
 }

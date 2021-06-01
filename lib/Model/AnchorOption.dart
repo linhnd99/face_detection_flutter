@@ -1,18 +1,18 @@
 class AnchorOption {
-  final int inputSizeWidth;
-  final int inputSizeHeight;
-  final double minScale;
-  final double maxScale;
-  final double anchorOffsetX;
-  final double anchorOffsetY;
-  final int numLayers;
-  final List<int> featureMapWidth;
-  final List<int> featureMapHeight;
-  final List<int> strides;
-  final List<double> aspectRatios;
-  final bool reduceBoxesInLowestLayer;
-  final double interpolatedScaleAspectRatio;
-  final bool fixedAnchorSize;
+  final int? inputSizeWidth;
+  final int? inputSizeHeight;
+  final double? minScale;
+  final double? maxScale;
+  final double? anchorOffsetX;
+  final double? anchorOffsetY;
+  final int? numLayers;
+  final List<int>? featureMapWidth;
+  final List<int>? featureMapHeight;
+  final List<int>? strides;
+  final List<double>? aspectRatios;
+  final bool? reduceBoxesInLowestLayer;
+  final double? interpolatedScaleAspectRatio;
+  final bool? fixedAnchorSize;
 
   AnchorOption({
     this.inputSizeWidth,
@@ -32,15 +32,15 @@ class AnchorOption {
   });
 
   int get stridesSize {
-    return strides.length;
+    return strides!.length;
   }
 
   int get featureMapHeightSize {
-    return featureMapHeight.length;
+    return featureMapHeight!.length;
   }
 
   int get featureMapWidthSize {
-    return featureMapWidth.length;
+    return featureMapWidth!.length;
   }
 }
 
