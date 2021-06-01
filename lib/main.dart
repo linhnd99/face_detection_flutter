@@ -31,29 +31,30 @@ class MyApp extends StatefulWidget {
 }
 
 class MyAppState extends State<MyApp> {
-  CameraDescription camera;
-  CameraController controller;
-  Future<void> _initializeControllerFuture;
+  late CameraDescription camera;
+  CameraController? controller;
+  Future<void>? _initializeControllerFuture;
 
-  List<Anchor> _anchors = new List();
-  ImageProcessor _imageProcessor;
-  Interpreter _interpreter;
-  OptionsFace options;
-  AnchorOption anchors;
-  List<Detection> _detections;
+  List<Anchor> _anchors = [];
+  late ImageProcessor _imageProcessor;
+  late Interpreter _interpreter;
+  late OptionsFace options;
+  late AnchorOption anchors;
+  List<Detection> _detections = [];
 
   bool _isDetecting = false;
-  Directory dir;
+  Directory? dir;
 
   @override
   void initState() {
-    _detections = List<Detection>();
+    super.initState();
     _loadModel();
   }
 
   @override
   void dispose() {
-    controller.dispose();
+    controller!.dispose();
+    super.dispose();
   }
 
   @override
@@ -63,17 +64,21 @@ class MyAppState extends State<MyApp> {
             child: CircularProgressIndicator(),
           )
         : Stack(
-          children: [
-            Container(
-              child: AspectRatio(
-                aspectRatio: controller.value.aspectRatio,
-                child: CameraPreview(controller),
+            children: [
+              Container(
+                child: AspectRatio(
+                  aspectRatio: controller!.value.aspectRatio,
+                  child: CameraPreview(controller!),
+                ),
               ),
-            ),
-
-            BoundingBox(_detections, 640, 480, MediaQuery.of(context).size.height, MediaQuery.of(context).size.width),
-          ],
-    );
+              BoundingBox(
+                  _detections,
+                  640,
+                  480,
+                  MediaQuery.of(context).size.height,
+                  MediaQuery.of(context).size.width),
+            ],
+          );
   }
 
   void _loadModel() async {
@@ -129,12 +134,12 @@ class MyAppState extends State<MyApp> {
     camera = (await availableCameras())[1];
 
     controller = CameraController(camera, ResolutionPreset.medium);
-    await controller.initialize();
+    await controller!.initialize();
 
     controller = CameraController(camera, ResolutionPreset.medium);
-    await controller.initialize();
+    await controller!.initialize();
     setState(() {});
-    await controller.startImageStream((CameraImage image) async {
+    await controller!.startImageStream((CameraImage image) async {
       if (_isDetecting) return;
       _isDetecting = true;
       await Future.delayed(const Duration(seconds: 1), () {

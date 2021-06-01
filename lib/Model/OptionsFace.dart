@@ -1,11 +1,11 @@
 class OptionsFace {
-  final int numClasses;
-  final int numBoxes;
-  final int numCoords;
-  final int keypointCoordOffset;
-  final List<int> ignoreClasses;
-  final double scoreClippingThresh;
-  final double minScoreThresh;
+  final int? numClasses;
+  final int? numBoxes;
+  final int? numCoords;
+  final int? keypointCoordOffset;
+  final List<int>? ignoreClasses;
+  final double? scoreClippingThresh;
+  final double? minScoreThresh;
   final int numKeypoints;
   final int numValuesPerKeypoint;
   final int boxCoordOffset;
